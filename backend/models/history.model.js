@@ -1,7 +1,7 @@
 module.exports = (sequelize, Sequelize) => {
   const History = sequelize.define("history", {
     query: {
-      type: Sequelize.STRING(30),
+      type: Sequelize.STRING(128),
       allowNull: false,
     },
     results: {

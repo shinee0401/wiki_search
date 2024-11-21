@@ -5,6 +5,8 @@ import SearchHistory from '../components/SearchHistory';
 import { API_BASE_URL } from '../contants';
 
 const Home = () => {
+  const [query, setQuery] = useState('');
+  const [loading, setLoading] = useState(false);
   const [results, setResults] = useState([]);
   const [histories, setHistories] = useState([]);
 
@@ -30,6 +32,7 @@ const Home = () => {
     if (selectedHistory) {
       setResults(JSON.parse(selectedHistory.results));
     } else {
+      setLoading(true);
       const response = await fetch(`${API_BASE_URL}/search?query=${query}`);
       if (response.ok) {
         const { results } = await response.json();
@@ -39,12 +42,14 @@ const Home = () => {
         const errors = await response.json();
         console.error('errors', errors);
       }
+      setLoading(false);
     }
   };
 
   const handleSelect = (id) => {
     const selectedHistory = histories.find((item) => item.id === id);
     setResults(JSON.parse(selectedHistory.results));
+    setQuery(selectedHistory.query);
   }
 
   const handleClearResults = () => {
@@ -52,7 +57,6 @@ const Home = () => {
   }
 
   const handleDelete = async (id) => {
-    console.log('delete', id);
     const response = await fetch(`${API_BASE_URL}/histories/${id}`, {
       method: 'DELETE'
     });
@@ -67,13 +71,13 @@ const Home = () => {
   return (
     <div className="container mx-auto">
       <h2 className="text-3xl font-bold mt-6 mb-4" align="center">Wiki Search</h2>
-      <SearchBar onSearch={handleSearch} />
-      <div className="w-full flex">
-        <div className="w-1/4 border-r">
+      <SearchBar query={query} setQuery={setQuery} onSearch={handleSearch} />
+      <div className="w-full flex flex-wrap">
+        <div className="sm:w-1/4 w-full sm:border-r border-0">
           <SearchHistory histories={histories} onSelect={handleSelect} onDelete={handleDelete} />
         </div>
-        <div className="w-3/4">
-          <SearchResult results={results} clearResults={handleClearResults} />
+        <div className="sm:w-3/4 w-full sm:mt-0 mt-4 overflow-hidden">
+          <SearchResult loading={loading} results={results} clearResults={handleClearResults} />
         </div>
       </div>
     </div>

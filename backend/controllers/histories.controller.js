@@ -27,7 +27,11 @@ exports.search = async (req, res) => {
 
 exports.index = async (req, res) => {
   try{
-    const histories = await History.findAll({});
+    const histories = await History.findAll({
+      order: [
+        ['updatedAt', 'DESC']
+      ]
+    });
     return res.json({histories});
   }catch(err){
     console.error('Error in server:', err);
